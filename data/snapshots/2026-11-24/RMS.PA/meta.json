@@ -1,0 +1,13 @@
+{
+ "ticker": "RMS.PA",
+ "telecharge_le": "2026-11-24T11:50:32",
+ "source": "yfinance 1.8.0",
+ "pairs": [
+  "MC.PA",
+  "KER.PA",
+  "CFR.SW",
+  "MONC.MI"
+ ],
+ "indice": "^FCHI",
+ "avertissements": []
+}

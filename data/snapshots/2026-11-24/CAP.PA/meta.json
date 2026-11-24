@@ -1,0 +1,12 @@
+{
+ "ticker": "CAP.PA",
+ "telecharge_le": "2026-11-24T11:50:41",
+ "source": "yfinance 1.8.0",
+ "pairs": [
+  "SOP.PA",
+  "ATE.PA",
+  "ACN"
+ ],
+ "indice": "^FCHI",
+ "avertissements": []
+}

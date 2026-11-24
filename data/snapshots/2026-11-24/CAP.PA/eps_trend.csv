@@ -1,0 +1,5 @@
+period,current,7daysAgo,30daysAgo,60daysAgo,90daysAgo,currency,methodology
+0q,,,,,,EUR,normalized
++1q,,,,,,EUR,normalized
+0y,12.87372,12.91718,12.85796,12.68486,12.69707,EUR,normalized
++1y,10.69618,10.6373,10.62931,10.56567,10.61833,EUR,normalized

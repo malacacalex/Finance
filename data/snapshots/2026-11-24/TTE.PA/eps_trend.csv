@@ -1,0 +1,5 @@
+period,current,7daysAgo,30daysAgo,60daysAgo,90daysAgo,currency,methodology
+0q,3.98873,4.19542,3.51989,2.767,2.661,USD,normalized
++1q,3.41443,3.02226,1.99903,2.36724,2.36724,USD,normalized
+0y,12.99106,12.77216,12.26144,11.24326,10.84408,USD,normalized
++1y,11.78012,11.45389,11.04,10.22717,9.77136,USD,normalized

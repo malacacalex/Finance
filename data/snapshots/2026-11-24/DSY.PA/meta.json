@@ -1,0 +1,12 @@
+{
+ "ticker": "DSY.PA",
+ "telecharge_le": "2026-11-24T11:50:59",
+ "source": "yfinance 1.8.0",
+ "pairs": [
+  "SAP.DE",
+  "ADSK",
+  "PTC"
+ ],
+ "indice": "^FCHI",
+ "avertissements": []
+}

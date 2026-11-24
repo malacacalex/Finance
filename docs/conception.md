@@ -52,15 +52,17 @@ flowchart LR
     ORD --> XL[/outputs/…/resultats.xlsx<br>+ graphiques PNG/]
 ```
 
-**Trois commandes en ligne de commande** :
+**Quatre commandes en ligne de commande** :
 
 | Commande | Rôle |
 |---|---|
 | `invest fetch` | Télécharge les cours (OHLCV) et les fondamentaux des 5 actions et de leurs pairs, puis les fige dans `data/snapshots/AAAA-MM-JJ/` |
+| `invest veille` | Lance les requêtes de dorking (§7.1) et ajoute les nouvelles actualités dans l'onglet `Actualites` de `saisies.xlsx`, avec le statut « à classer » |
 | `invest template` | Génère ou met à jour le classeur de saisie `data/saisies.xlsx` (listes déroulantes −2..+2, colonnes de justification) |
 | `invest run --snapshot AAAA-MM-JJ --scenario hypotheses_groupe` | Calcule les scores, l'allocation, Monte Carlo et les ordres, puis écrit le rapport Excel |
 
-Pour une réévaluation quotidienne (CLI-03), on relance `fetch`, puis on met à jour l'onglet
+Pour une réévaluation quotidienne (CLI-03), on relance `fetch` et `veille`, on classe les
+nouvelles actualités, puis on met à jour l'onglet
 *Portefeuille* avec les positions réellement détenues, puis on lance `run`. Le moteur calcule les
 ordres comme la différence entre le portefeuille cible et le portefeuille courant.
 
@@ -73,18 +75,20 @@ Finance/
 ├── config/
 │   ├── parametres.yaml           # réglages ABC Bourse + grilles de notation (choix du groupe)
 │   ├── univers.yaml              # tickers, noms, pairs sectoriels
+│   ├── veille.yaml               # requêtes de dorking, catégories, niveaux de fiabilité des sources
 │   ├── client.yaml               # besoins du client : null tant que non fournis (CDC §4)
 │   └── scenarios/
 │       └── hypotheses_groupe.yaml  # valeurs provisoires du groupe, « NON VALIDÉES »
 ├── data/
 │   ├── saisies.xlsx              # rempli par le groupe
-│   └── snapshots/2026-11-30/     # prix.csv, fondamentaux.csv, meta.json
+│   └── snapshots/2026-11-30/     # prix.csv, fondamentaux.csv, veille_brute.csv, meta.json
 ├── outputs/2026-11-30_1805/      # resultats.xlsx, graphiques/*.png, run.json
 ├── src/invest_model/
 │   ├── cli.py                    # point d'entrée des 3 commandes
 │   ├── config.py                 # chargement, fusion client + scénario, validation
 │   ├── data.py                   # yfinance → instantané ; lecture d'un instantané
 │   ├── inputs.py                 # génération et lecture de saisies.xlsx
+│   ├── watch.py                  # veille : requêtes dorking → nouvelles lignes « à classer »
 │   ├── grids.py                  # conversion valeur → note −2..+2 (générique)
 │   ├── indicators/               # fonctions pures : Series pandas → Series
 │   │   ├── moving_averages.py
@@ -261,6 +265,58 @@ signe donne le sens, la valeur absolue l'importance), **fiabilité** de 1 à 3 e
   ramène dans −2..+2. Sans aucune nouvelle, la note vaut 0.
 - **Qualitatif (importance et fiabilité)** : la moyenne des notes du groupe pondérée par la
   fiabilité, `Σ note·fiab / Σ fiab`, qui est déjà dans −2..+2.
+- Seules les nouvelles **classées** (note renseignée) comptent. Les lignes « à classer »
+  produites par la veille sont ignorées et signalées dans le *Journal*.
+
+### 7.1 Veille automatique par dorking (`invest veille`)
+
+**Objectif** : trouver des informations fraîches sans tout chercher à la main. Le script collecte
+les nouvelles et les pré-remplit ; **la notation reste faite par le groupe**, puisque
+l'importance et la fiabilité relèvent du jugement (GRP-05).
+
+**Sources** (par ordre de préférence) :
+
+| Source | Accès | Usage |
+|---|---|---|
+| Google News RSS (`news.google.com/rss/search`) | Gratuit, sans clé. Accepte les opérateurs `"…"`, `OR`, `-`, `site:`, `intitle:` et `when:7d` (testé le 24/11/2026) | Source principale : presse et actualités récentes |
+| API Google Programmable Search (JSON) | Clé gratuite, 100 requêtes par jour | Optionnelle : dorks sur les sites officiels (`site:hermes-finance.com filetype:pdf`, `site:amf-france.org …`) |
+| Flux RSS des sites investisseurs des émetteurs (quand ils existent) | Gratuit | Communiqués officiels |
+
+Pas d'interrogation automatisée de la page de recherche Google classique : elle bloque les robots
+(page anti-robot constatée), et ses conditions d'utilisation l'interdisent.
+
+**Requêtes paramétrables** dans `config/veille.yaml`, un modèle par catégorie, appliqué à chaque
+action :
+
+```yaml
+fenetre: "when:7d"
+modeles:
+  resultats:   '"{nom}" (résultats OR "chiffre d''affaires" OR guidance OR trimestre)'
+  communique:  '"{nom}" (communiqué OR annonce OR acquisition OR dividende)'
+  secteur:     '{secteur_mots_cles} -"{nom}"'
+  macro:       '(BCE OR inflation OR "taux directeurs") CAC 40'
+  officiel:    'site:{site_ir} OR site:amf-france.org "{nom}"'   # API Programmable Search uniquement
+fiabilite_par_domaine:        # SUGGESTION pré-remplie, le groupe confirme
+  3: [amf-france.org, euronext.com, "{site_ir}"]
+  2: [lesechos.fr, investir.lesechos.fr, boursier.com, zonebourse.com, abcbourse.com, reuters.com]
+  1: ["*"]                     # tous les autres domaines
+```
+
+**Traitement** :
+1. Pour chaque action et chaque modèle, on exécute la requête, avec une pause entre les appels
+   (une vingtaine de requêtes au total).
+2. On normalise les résultats : date, titre, source, domaine, URL et requête d'origine.
+3. On **dédoublonne** par rapport aux lignes déjà présentes, selon l'URL ou le titre normalisé.
+   Relancer le script n'ajoute donc que les vraies nouveautés.
+4. On **ajoute les nouvelles lignes** à l'onglet `Actualites` : statut « à classer », catégorie
+   pré-remplie selon le modèle de requête, fiabilité suggérée selon le domaine. Note et
+   justification restent vides. Les lignes déjà classées par le groupe ne sont jamais modifiées.
+5. On archive le résultat brut dans `snapshots/AAAA-MM-JJ/veille_brute.csv`, pour pouvoir
+   reproduire la collecte (GRP-24).
+
+**Limites connues** : les liens Google News sont des redirections (on garde aussi le nom de la
+source) ; un même article peut sortir pour plusieurs actions ; le flux renvoie au maximum une
+centaine de résultats par requête.
 
 ## 8. Pilier 4 — Hasard (Monte Carlo)
 
@@ -382,7 +438,10 @@ traçable.
 7. **Rôle du pilier Hasard** (§8.3) : un score quantitatif (poids réglable, éventuellement 0) et
    le contrôle du risque.
 8. **Vérification Excel** (§8.4) : un onglet exact et un onglet ALEA avec table de données.
-9. **Pile technique** : Python 3.11+, pandas, numpy, yfinance, openpyxl, PyYAML, matplotlib,
+9. **Veille par dorking** (§7.1) : Google News RSS comme source principale, et l'API
+    Programmable Search en option pour les dorks `site:` et `filetype:`. Les lignes sont
+    pré-remplies « à classer », la notation reste humaine.
+10. **Pile technique** : Python 3.11+, pandas, numpy, yfinance, openpyxl, PyYAML, matplotlib,
    pytest. Pas de bibliothèque d'analyse technique toute faite.
 
 Après validation : rédaction de `specifications.md`, avec des exigences numérotées `SPE-xx` qui

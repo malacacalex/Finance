@@ -10,6 +10,7 @@
 | Version | Date | Auteur(s) | Modifications |
 |---|---|---|---|
 | 0.1 | 2026-11-24 | Groupe | Création de la structure, questions à poser au client |
+| 0.2 | 2026-11-24 | Groupe | Ajout de GRP-12 (veille automatique par dorking) |
 | | | | |
 
 ---
@@ -159,6 +160,8 @@ réponse du client : dans ce cas, c'est la réponse du client qui l'emporte, et 
 | GRP-10 | La partie Monte Carlo doit pouvoir être **refaite dans Excel** (ALEA, LOI.NORMALE.INVERSE, table de données) pour vérification. |
 | GRP-11 | Les indicateurs utilisent les **mêmes réglages qu'ABC Bourse** (RSI 14 jours, moyennes mobiles 20/50/100 jours, Bollinger, MACD et sa ligne de signal), pour pouvoir comparer nos résultats à leurs fiches « Analyse et conseil ». |
 
+| GRP-12 | **Veille automatique** : un script collecte les actualités récentes par requêtes avancées (dorking) et les ajoute au classeur de saisie, sans doublon et avec le statut « à classer ». La notation (sens, importance, fiabilité) reste faite par le groupe. |
+
 ### 5.2 Exigences non fonctionnelles
 
 | ID | Exigence |
@@ -175,7 +178,8 @@ réponse du client : dans ce cas, c'est la réponse du client qui l'emporte, et 
 
 - Passage d'ordres réels chez un courtier.
 - Données temps réel ou intrajournalières, sauf si le client les demande.
-- Analyse de sentiment automatique des actualités : le classement est fait par le groupe.
+- Analyse de sentiment automatique des actualités : la **collecte** est automatisée (GRP-12),
+  mais le **classement** est fait par le groupe.
 - Conseil en investissement au sens réglementaire.
 
 ---
@@ -205,7 +209,7 @@ conception. Les autres peuvent attendre.
 
 ### 7.3 Pour affiner
 
-13. Les données yfinance sont-elles acceptables ? D'autres sources sont-elles imposées ou interdites ? *(CLI-08)*
+13. Les données yfinance sont-elles acceptables ? D'autres sources sont-elles imposées ou interdites ? La collecte automatique d'actualités (presse, Google News) est-elle acceptée ? *(CLI-08)*
 14. Faut-il tenir compte des dividendes détachés pendant la semaine ? *(CLI-06)*
 15. Faut-il des stop-loss ou des take-profit ? *(CLI-02)*
 16. Sur quelle période historique calibrer la volatilité ? *(CLI-08)*

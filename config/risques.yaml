@@ -1,0 +1,44 @@
+# =============================================================================
+# Risques QUALITATIFS proposés par société (matrice de risque).
+# Recopiés UNE FOIS dans l'onglet "Risques" de data/saisies.xlsx à sa création :
+# ensuite, c'est le classeur qui fait foi et le groupe ajuste probabilité / impact.
+# Probabilité et impact : 1 (très faible) .. 5 (très fort).
+# Ce sont des PROPOSITIONS à discuter et justifier en groupe.
+# =============================================================================
+
+AI.PA:
+  - risque: "Coût de l'énergie (électricité, gaz) dans la production des gaz"
+    categorie: "Opérationnel"
+    probabilite: 3
+    impact: 2
+    justification: "Proposition : contrats Grande Industrie en partie indexés sur l'énergie (répercussion), mais décalage possible sur les marges de l'Industriel Marchand."
+  - risque: "Ralentissement de la production industrielle (Europe, Chine)"
+    categorie: "Macro / cyclique"
+    probabilite: 3
+    impact: 3
+    justification: "Proposition : les volumes de gaz suivent l'activité industrielle de ses clients."
+  - risque: "Effet de change (USD notamment)"
+    categorie: "Financier"
+    probabilite: 3
+    impact: 2
+    justification: "Proposition : part importante de l'activité aux États-Unis ; comptes publiés en euros."
+  - risque: "Rentabilité des projets hydrogène et transition énergétique"
+    categorie: "Stratégique"
+    probabilite: 2
+    impact: 3
+    justification: "Proposition : investissements lourds à horizon long, retour sur capital incertain."
+  - risque: "Pression concurrentielle (Linde, Air Products)"
+    categorie: "Sectoriel"
+    probabilite: 2
+    impact: 2
+    justification: "Proposition : marché concentré (oligopole), contrats longs, risque surtout sur les nouveaux projets."
+  - risque: "Réglementation environnementale (CO2, quotas, normes)"
+    categorie: "Réglementaire"
+    probabilite: 3
+    impact: 2
+    justification: "Proposition : activité énergivore ; à nuancer avec les opportunités liées à la décarbonation."
+  - risque: "Réglementation des prix en Santé (gaz médicaux, soins à domicile)"
+    categorie: "Réglementaire"
+    probabilite: 2
+    impact: 2
+    justification: "Proposition : tarifs fixés par les systèmes de santé dans plusieurs pays."

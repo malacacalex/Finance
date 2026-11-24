@@ -11,6 +11,7 @@
 |---|---|---|---|
 | 0.1 | 2026-11-24 | Groupe | Création de la structure, questions à poser au client |
 | 0.2 | 2026-11-24 | Groupe | Ajout de GRP-12 (veille automatique par dorking) |
+| 0.3 | 2026-11-24 | Groupe | Ajout de GRP-13 (analyse complète d'une société) et GRP-14 (matrice de risque) |
 | | | | |
 
 ---
@@ -159,8 +160,9 @@ réponse du client : dans ce cas, c'est la réponse du client qui l'emporte, et 
 | GRP-09 | **Export Excel** des résultats. |
 | GRP-10 | La partie Monte Carlo doit pouvoir être **refaite dans Excel** (ALEA, LOI.NORMALE.INVERSE, table de données) pour vérification. |
 | GRP-11 | Les indicateurs utilisent les **mêmes réglages qu'ABC Bourse** (RSI 14 jours, moyennes mobiles 20/50/100 jours, Bollinger, MACD et sa ligne de signal), pour pouvoir comparer nos résultats à leurs fiches « Analyse et conseil ». |
-
 | GRP-12 | **Veille automatique** : un script collecte les actualités récentes par requêtes avancées (dorking) et les ajoute au classeur de saisie, sans doublon et avec le statut « à classer ». La notation (sens, importance, fiabilité) reste faite par le groupe. |
+| GRP-13 | **Analyse d'une société** : une commande produit, avec des données à jour, toutes les informations utiles sur une action (indicateurs, ratios, consensus, actualités, risques) et une décision : acheter, vendre, attendre, conserver. Première société étudiée : Air Liquide. |
+| GRP-14 | **Matrice de risque** probabilité × impact, qui combine des risques notés automatiquement (règles explicites) et des risques notés par le groupe, avec les mesures de risque usuelles (volatilité, bêta, VaR, drawdown…). |
 
 ### 5.2 Exigences non fonctionnelles
 

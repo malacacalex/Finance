@@ -1,9 +1,44 @@
 # Conception — Modèle d'aide à l'investissement
 
-> **Statut : PROPOSITION v0.1, à valider par le groupe avant tout développement.**
+> **Statut : v0.2.** La livraison 1 (analyse d'une société, §0) est développée. L'allocation
+> des 500 k€ sur 5 actions (§9.2) reste à faire.
 > Ce document découle du [cahier des charges](cahier-des-charges.md). Les identifiants
-> `ENO-xx` / `CLI-xx` / `GRP-xx` renvoient à ses exigences. Les points à trancher sont
+> `ENO-xx` / `CLI-xx` / `GRP-xx` renvoient à ses exigences. Les points encore ouverts sont
 > regroupés au [§11](#11-points-à-valider).
+
+---
+
+## 0. Livraison 1 : analyse complète d'une société (`invest analyse AI.PA`)
+
+Première étape demandée : étudier **Air Liquide** seule, avec des informations à jour, et décider
+s'il faut acheter, vendre ou attendre. Cette livraison réutilise **exactement** l'architecture
+cible : indicateurs, piliers, scores, risques et rapport serviront tels quels pour les 5 actions.
+Seule l'allocation (§9.2) reste à écrire.
+
+```mermaid
+flowchart LR
+    A[yfinance<br>cours, ratios, états financiers,<br>consensus, actualités, pairs, CAC 40] --> S[(Instantané daté)]
+    W[Google News RSS<br>dorking] --> X[/saisies.xlsx<br>onglet Actualites/]
+    S --> P1[Graphique] & P2[Financier] & P4[Monte Carlo]
+    X --> P3[Informations]
+    X --> P1 & P2
+    P1 & P2 & P3 & P4 --> SC[Score −2..+2]
+    S & P4 & P2 & P1 & P3 --> RM[Matrice de risque]
+    SC & RM --> D[Décision<br>+ stop / objectifs]
+    D --> R[/resultats.xlsx + rapport.md + graphiques/]
+```
+
+Ajouts par rapport à la proposition initiale :
+
+| Ajout | Pourquoi | Documentation |
+|---|---|---|
+| **Matrice de risque** 5×5 (probabilité × impact), avec des risques quantitatifs notés automatiquement et des risques qualitatifs notés par le groupe | Demande « matrice de risque » | [matrice-risque.md](indicateurs/matrice-risque.md) |
+| **Mesures de risque** : volatilités, bêta, corrélations, drawdown, VaR historique, paramétrique et Monte Carlo, Sharpe, Sortino | Vue complète du risque | idem |
+| **Décision selon la position** : ACHETER ou ATTENDRE sans position ; RENFORCER, CONSERVER, ALLÉGER ou VENDRE avec position (onglet *Portefeuille*) | « j'achète, je vends, j'attends » | `decision.py` |
+| **Stop et objectifs** tirés des pivots hebdomadaires, avec le ratio gain / risque | Rendre la décision exploitable | [points-pivots.md](indicateurs/points-pivots.md) |
+| **Sens suggéré** des actualités par lexique, compté dans le quanti tant que le groupe n'a pas noté (signalé, désactivable) | Avoir un pilier Informations à jour sans attendre la saisie | [informations-veille.md](indicateurs/informations-veille.md) |
+| **Consensus des analystes**, historique financier, dividendes, actionnariat, profil (affichés, non notés) | « tout savoir sur la société » | onglets *Analystes*, *Financier*, *Profil* |
+| **Onglet Contrôle ABC** : nos valeurs face à celles de la fiche ABC relevées par le groupe | GRP-11 | `analyse.py` |
 
 ---
 

@@ -1,0 +1,30 @@
+# =============================================================================
+# BESOINS DU CLIENT (le professeur) — voir docs/cahier-des-charges.md §4
+#
+# Ne renseigner une valeur QUE sur réponse du professeur, en notant la référence
+# CLI-xx et la date. Une valeur ici l'emporte TOUJOURS sur le scénario.
+# null = inconnu => la valeur du scénario est utilisée et signalée dans le rapport.
+# =============================================================================
+
+client:
+  horizon_jours: null             # CLI-03
+  date_debut: null                # CLI-03
+  date_fin: null                  # CLI-03
+  prix_execution: null            # CLI-03 : ouverture / clôture
+  montant_analyse: null           # CLI-05
+  niveau_confiance: null          # CLI-02
+  perte_max: null                 # CLI-02
+  fenetre_historique_jours: null  # CLI-08
+  taux_sans_risque: null          # CLI-05
+  vente_decouvert: null           # CLI-04
+  actions_entieres: null          # CLI-04
+  cash_min: null                  # CLI-05
+  cash_max: null                  # CLI-05
+  poids_min: null                 # CLI-05
+  poids_max: null                 # CLI-05
+  frais_pct: null                 # CLI-06
+  frais_fixe: null                # CLI-06
+  frais_min: null                 # CLI-06
+
+poids_piliers: null               # CLI-08 : si le client impose des poids
+part_quanti: null                 # CLI-08

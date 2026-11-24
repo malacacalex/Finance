@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# Résultats générés : régénérables avec `invest analyse`
+outputs/
+
+# Fichiers temporaires d'Excel / LibreOffice
+~$*.xlsx
+.~lock.*#

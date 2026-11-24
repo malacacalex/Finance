@@ -1,0 +1,129 @@
+# =============================================================================
+# Paramètres techniques du modèle : choix du GROUPE (pas du client).
+# Réglages des indicateurs = ceux d'ABC Bourse (GRP-11), voir docs/indicateurs/.
+# Grilles de notation : propositions du groupe, ajustables sans toucher au code.
+#
+# Grille "bornes" : 4 bornes croissantes [b1, b2, b3, b4] -> 5 notes.
+#   x < b1 -> note la plus basse ; b1 <= x < b2 -> ... ; x >= b4 -> note la plus haute.
+#   plus_haut_mieux: true  => notes [-2, -1, 0, +1, +2]
+#   plus_haut_mieux: false => notes [+2, +1, 0, -1, -2]
+# =============================================================================
+
+donnees:
+  historique: "2y"            # profondeur téléchargée (assez pour MM100 et volatilité 1 an)
+  indice_reference: "^FCHI"   # CAC 40, pour bêta et performance relative
+  dossier_snapshots: "data/snapshots"
+  dossier_sorties: "outputs"
+  classeur_saisies: "data/saisies.xlsx"
+
+# --------------------------------------------------------------------------
+# Pilier 1 — Graphique
+# --------------------------------------------------------------------------
+technique:
+  moyennes_mobiles: [20, 50, 100]        # MM simples, fiche ABC "Analyse et conseil"
+  rsi:
+    periode: 14                          # ABC : RSI 14 jours (Wilder)
+    grille: {bornes: [30, 40, 60, 70], plus_haut_mieux: false}   # <30 survente (+2), >=70 surachat (-2)
+  macd:
+    rapide: 12
+    lente: 26
+    signal: 9
+    seances_validation: 14     # ABC : croisement valide si >= 14 séances du même côté avant
+    croisement_recent: 5       # un croisement validé de moins de N séances vaut +/-2
+  bollinger:
+    periode: 20
+    ecarts_types: 2
+    retour_seances: 3          # fenêtre pour détecter une "réintégration" dans les bandes
+    notes:                     # lecture ABC : sortie = continuation, sortie puis retour = retournement
+      reintegration_basse: 2
+      sortie_haute: 1
+      interieur: 0
+      sortie_basse: -1
+      reintegration_haute: -2
+  moyennes_mobiles_notes:      # nb de MM sous le cours -> note
+    "3": 2
+    "2": 1
+    "1": -1
+    "0": -2
+  pivots:
+    poids_quotidien: 0.5       # pivots quotidiens (outil ABC) ...
+    poids_hebdo: 0.5           # ... et hebdomadaires (horizon 1 semaine)
+  poids_indicateurs:           # pondération dans le quanti du pilier
+    rsi: 1
+    macd: 1
+    bollinger: 1
+    moyennes_mobiles: 1
+    pivots: 1
+
+# --------------------------------------------------------------------------
+# Pilier 2 — Financier (ratios comparés à la médiane des pairs : GRP-04)
+# mode: relatif => note sur valeur / médiane secteur ; absolu => note sur la valeur
+# --------------------------------------------------------------------------
+financier:
+  ratios:
+    per:            {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: false, poids: 1}
+    peg:            {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: false, poids: 1}
+    rendement:      {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: true,  poids: 1}
+    roe:            {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: true,  poids: 1}
+    dette_ebitda:   {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: false, poids: 1}
+    marge_op:       {mode: relatif, bornes: [0.80, 0.95, 1.05, 1.20], plus_haut_mieux: true,  poids: 1}
+  # Contrôles "absolus" cités par ABC Bourse (affichés, non notés)
+  controles_abc:
+    peg_max: 1.0               # Leçon 9 : PEG < 1 = sous-évalué
+    roe_min: 0.10              # Fiche Analyse et conseil : ROE > 10 %
+
+# --------------------------------------------------------------------------
+# Pilier 3 — Informations
+# --------------------------------------------------------------------------
+informations:
+  fenetre_jours: 14            # nouvelles prises en compte
+  poids_categories:            # "classement" des nouvelles pour le comptage
+    resultats: 3
+    communique: 2
+    secteur: 1
+    macro: 1
+    presse: 1
+  grille_net: {bornes: [-0.6, -0.2, 0.2, 0.6], plus_haut_mieux: true}
+  utiliser_suggestions: true   # si true, une nouvelle non classée compte avec sa suggestion
+                               # automatique (lexique) dans le QUANTI, signalée dans le Journal
+  categories_suggestions: [resultats, communique, presse, officiel]
+                               # secteur et macro : trop bruités pour une suggestion automatique,
+                               # ils ne comptent que s'ils sont classés par le groupe
+
+# --------------------------------------------------------------------------
+# Pilier 4 — Hasard (Monte Carlo, mouvement brownien géométrique)
+# --------------------------------------------------------------------------
+monte_carlo:
+  simulations: 10000
+  graine: 42                   # reproductibilité (GRP-24)
+  lignes_verif_exacte: 500     # tirages Python recopiés dans l'onglet de vérification
+  lignes_verif_alea: 1000      # lignes ALEA dans l'onglet de vérification Excel
+  grille_proba_gain: {bornes: [0.40, 0.47, 0.53, 0.60], plus_haut_mieux: true}
+
+# --------------------------------------------------------------------------
+# Matrice de risque : risques quantitatifs notés automatiquement (1..5)
+# Probabilité et impact : bornes [b1..b4] -> 1..5 (plus la valeur est haute, plus c'est risqué)
+# --------------------------------------------------------------------------
+risques:
+  seuil_choc_hebdo: 0.05       # "baisse de plus de 5 % sur l'horizon"
+  zones:                       # criticité = probabilité x impact
+    faible: 4                  # 1..4
+    modere: 9                  # 5..9
+    eleve: 15                  # 10..15, au-delà : critique
+  marche:                      # P(baisse > seuil) issue de Monte Carlo ; impact = CVaR (%)
+    proba_bornes: [0.02, 0.05, 0.10, 0.20]
+    impact_bornes: [0.02, 0.04, 0.06, 0.10]
+  valorisation:                # PER / médiane secteur
+    proba_bornes: [0.90, 1.05, 1.20, 1.40]
+    impact: 3
+  endettement:                 # dette nette / EBITDA (absolu)
+    proba_bornes: [1.0, 2.0, 3.0, 4.0]
+    impact: 3
+  support:                     # distance au support S1 hebdo, en écarts-types hebdo (inversé)
+    proba_bornes: [0.5, 1.0, 1.5, 2.0]   # plus c'est proche, plus c'est probable
+    impact_bornes: [0.02, 0.04, 0.06, 0.10]  # distance S1 -> S2 en %
+  information:                 # part des nouvelles négatives
+    proba_bornes: [0.15, 0.30, 0.45, 0.60]
+    impact: 3
+  evenement:                   # publication / détachement de dividende dans l'horizon
+    impact: 4

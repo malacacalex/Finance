@@ -1,0 +1,12 @@
+{
+ "ticker": "AI.PA",
+ "telecharge_le": "2026-11-24T10:07:20",
+ "source": "yfinance 1.8.0",
+ "pairs": [
+  "LIN",
+  "APD",
+  "4091.T"
+ ],
+ "indice": "^FCHI",
+ "avertissements": []
+}

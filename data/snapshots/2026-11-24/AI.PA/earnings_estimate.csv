@@ -1,0 +1,5 @@
+period,avg,low,high,numberOfAnalysts,yearAgoEps,growth,currency,methodology
+0q,,,,,,,EUR,normalized
++1q,3.41,3.41,3.41,1.0,,,EUR,normalized
+0y,6.41026,6.12,6.85,18.0,5.79927,0.105399996,EUR,normalized
++1y,7.19196,6.8182,7.55,18.0,6.41026,0.12189999,EUR,normalized

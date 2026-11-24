@@ -1,0 +1,39 @@
+# =============================================================================
+# Univers d'investissement (ENO-02) et pairs sectoriels (GRP-04, conception §6.1)
+# - pairs        : concurrents dont la MÉDIANE sert de référence secteur
+# - mots_cles    : un titre d'actualité doit contenir l'un d'eux pour être retenu
+# - secteur_requete : requête Google News pour l'actualité du secteur
+# - site_ir      : site investisseurs (dorks "site:")
+# =============================================================================
+
+actions:
+  AI.PA:
+    nom: "Air Liquide"
+    pairs: [LIN, APD, "4091.T"]          # Linde, Air Products, Nippon Sanso
+    mots_cles: ["air liquide"]
+    secteur_requete: '("gaz industriels" OR "industrial gases" OR Linde OR "Air Products")'
+    site_ir: "airliquide.com"
+  RMS.PA:
+    nom: "Hermès"
+    pairs: [MC.PA, KER.PA, CFR.SW, MONC.MI]
+    mots_cles: ["hermès", "hermes"]
+    secteur_requete: '(luxe OR LVMH OR Kering OR Richemont)'
+    site_ir: "finance.hermes.com"
+  CAP.PA:
+    nom: "Capgemini"
+    pairs: [SOP.PA, ATE.PA, ACN]
+    mots_cles: ["capgemini"]
+    secteur_requete: '("services informatiques" OR "ESN" OR Accenture OR "Sopra Steria")'
+    site_ir: "capgemini.com"
+  TTE.PA:
+    nom: "TotalEnergies"
+    pairs: [SHEL.L, BP.L, ENI.MI, REP.MC]
+    mots_cles: ["totalenergies", "total energies"]
+    secteur_requete: '(pétrole OR Brent OR OPEP OR "majors pétrolières")'
+    site_ir: "totalenergies.com"
+  DSY.PA:
+    nom: "Dassault Systèmes"
+    pairs: [SAP.DE, ADSK, PTC]
+    mots_cles: ["dassault systèmes", "dassault systemes"]
+    secteur_requete: '(logiciel OR SaaS OR SAP OR Autodesk)'
+    site_ir: "investor.3ds.com"

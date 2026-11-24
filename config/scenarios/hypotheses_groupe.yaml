@@ -1,0 +1,39 @@
+# =============================================================================
+# SCÉNARIO "hypotheses_groupe" — VALEURS PROVISOIRES DU GROUPE, NON VALIDÉES PAR LE CLIENT
+#
+# Ces valeurs permettent de faire tourner le modèle en attendant les réponses du
+# professeur (cahier des charges §4). Tout résultat produit avec ce scénario porte
+# un bandeau d'avertissement. Dès qu'une réponse du client est connue, elle va dans
+# config/client.yaml, qui l'emporte toujours sur ce fichier.
+# =============================================================================
+
+nom: "Hypothèses du groupe (non validées par le client)"
+
+# Poids entre piliers (GRP-07) — choix neutre : équipondéré
+poids_piliers:
+  graphique: 1
+  financier: 1
+  informations: 1
+  hasard: 1
+
+# Part du QUANTITATIF dans chaque pilier (lambda) ; 1 - lambda pour le qualitatif
+part_quanti:
+  graphique: 0.5
+  financier: 0.5
+  informations: 0.5
+
+# Seuils de décision sur le score final (-2..+2)
+decision:
+  achat_fort: 1.0
+  achat: 0.4
+  vente: -0.4
+  vente_forte: -1.0
+  risque_critique_bloque_achat: true   # un risque "critique" transforme ACHETER en ATTENDRE
+
+# Valeurs à confirmer par le client (CLI-xx) — hypothèses de travail
+client:
+  horizon_jours: 5                # CLI-03 : 1 semaine = 5 séances
+  montant_analyse: 100000         # CLI-05 : 500 000 € / 5 actions (équipondéré), pour chiffrer le risque
+  niveau_confiance: 0.95          # CLI-02 : VaR / CVaR à 95 %
+  fenetre_historique_jours: 252   # CLI-08 : calibrage sur 1 an de bourse
+  taux_sans_risque: 0.0           # CLI-05 : à renseigner (Sharpe / Sortino)
